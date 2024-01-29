@@ -6,41 +6,73 @@ import org.springframework.stereotype.Service
 
 @Service
 class DeliveryService {
-
     fun calculateDeliveryFee(request: DeliveryFeeCalc): DeliveryFee {
-        var deliveryFee = 0
+    val cartValueEuros = convertToEuros(request.cartValue)
 
-        // Convert cart value to euros
-        val cartValueEuros = request.cartValue / 100.0
+    val smallOrderSurcharge = calculateSmallOrderSurcharge(cartValueEuros)
 
-        // Calculate small order surcharge
-        val smallOrderSurcharge = if (cartValueEuros < 10) 10 - cartValueEuros else 0.0
+    var deliveryFee = calculateBaseDeliveryFee()
 
-        // Calculate base delivery fee for the first 1 km
-        deliveryFee += 200 // 2€ in cents
+    val additionalDistance = request.deliveryDistance - 1000
+    deliveryFee += calculateAdditionalDistanceFee(additionalDistance)
 
-        // Calculate additional fee for distance beyond 1 km
-        val additionalDistance = request.deliveryDistance - 1000
-        deliveryFee += (additionalDistance / 500 + if (additionalDistance % 500 > 0) 1 else 0) * 100 // 1€ per 500 meters
+    val itemSurcharge = calculateItemSurcharge(request.numberOfItems)
 
-        // Calculate surcharge for number of items
-        val itemSurcharge = if (request.numberOfItems >= 5) (request.numberOfItems - 4) * 50 else 0
+    val bulkItemSurcharge = calculateBulkItemSurcharge(request.numberOfItems)
 
-        // Calculate bulk item surcharge
-        val bulkItemSurcharge = if (request.numberOfItems > 12) ((request.numberOfItems - 12) * 50) + 120 else 0
+    val totalSurcharge = calculateTotalSurcharge(smallOrderSurcharge, itemSurcharge, bulkItemSurcharge)
 
-        // Total surcharge
-        val totalSurcharge = (smallOrderSurcharge + itemSurcharge + bulkItemSurcharge).coerceAtMost(1500.0) // Max 15€
+    deliveryFee += applySurcharges(deliveryFee, totalSurcharge)
 
-        // Apply surcharges
-        deliveryFee += totalSurcharge.toInt()
+    return DeliveryFee(deliveryFee = deliveryFee)
+}
 
-        // Ensure delivery fee does not exceed maximum
-        deliveryFee = deliveryFee.coerceAtMost(1500)
+private fun convertToEuros(cartValue: Int): Double {
+    return cartValue / 100.0
+}
 
-        return DeliveryFee(deliveryFee = deliveryFee)
+private fun calculateSmallOrderSurcharge(cartValueEuros: Double): Double {
+    return if (cartValueEuros < 10) {
+        10 - cartValueEuros
+    } else {
+        0.0
     }
+}
 
+private fun calculateBaseDeliveryFee(): Int {
+    return 200 // 2€ in cents
+}
 
+private fun calculateAdditionalDistanceFee(additionalDistance: Int): Int {
+    return (additionalDistance / 500 + if (additionalDistance % 500 > 0) 1 else 0) * 100 // 1€ per 500 meters
+}
+
+private fun calculateItemSurcharge(numberOfItems: Int): Int {
+    return if (numberOfItems >= 5) {
+        (numberOfItems - 4) * 50
+    } else {
+        0
+    }
+}
+
+private fun calculateBulkItemSurcharge(numberOfItems: Int): Int {
+    return if (numberOfItems > 12) {
+        ((numberOfItems - 12) * 50) + 120
+    } else {
+        0
+    }
+}
+
+private fun calculateTotalSurcharge(
+    smallOrderSurcharge: Double,
+    itemSurcharge: Int,
+    bulkItemSurcharge: Int
+): Double {
+    return (smallOrderSurcharge + itemSurcharge + bulkItemSurcharge).coerceAtMost(1500.0) // Max 15€
+}
+
+private fun applySurcharges(deliveryFee: Int, totalSurcharge: Double): Int {
+    return (deliveryFee + totalSurcharge).coerceAtMost(1500)
+}
 
 }
