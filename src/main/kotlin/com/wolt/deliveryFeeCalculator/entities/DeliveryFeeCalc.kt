@@ -1,4 +1,4 @@
-package com.wolt.DeliveryFeeCalculator.entities
+package com.wolt.deliveryFeeCalculator.entities
 
 data class DeliveryFeeCalc (
         val cartValue: Int,

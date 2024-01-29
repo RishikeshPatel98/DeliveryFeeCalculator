@@ -1,7 +1,7 @@
-package com.wolt.DeliveryFeeCalculator.service
+package com.wolt.deliveryFeeCalculator.service
 
-import com.wolt.DeliveryFeeCalculator.entities.DeliveryFee
-import com.wolt.DeliveryFeeCalculator.entities.DeliveryFeeCalc
+import com.wolt.deliveryFeeCalculator.entities.DeliveryFee
+import com.wolt.deliveryFeeCalculator.entities.DeliveryFeeCalc
 import org.springframework.stereotype.Service
 
 @Service
@@ -63,16 +63,18 @@ private fun calculateBulkItemSurcharge(numberOfItems: Int): Int {
     }
 }
 
-private fun calculateTotalSurcharge(
-    smallOrderSurcharge: Double,
-    itemSurcharge: Int,
-    bulkItemSurcharge: Int
-): Double {
-    return (smallOrderSurcharge + itemSurcharge + bulkItemSurcharge).coerceAtMost(1500.0) // Max 15€
-}
+    private fun calculateTotalSurcharge(
+        smallOrderSurcharge: Double,
+        itemSurcharge: Int,
+        bulkItemSurcharge: Int
+    ): Double {
+        val totalSurcharge = smallOrderSurcharge + itemSurcharge + bulkItemSurcharge
+        return if (totalSurcharge > 1500.0) 1500.0 else totalSurcharge // Max 15€
+    }
 
-private fun applySurcharges(deliveryFee: Int, totalSurcharge: Double): Int {
-    return (deliveryFee + totalSurcharge).coerceAtMost(1500)
-}
+    private fun applySurcharges(deliveryFee: Int, totalSurcharge: Double): Int {
+        val finalFee = deliveryFee + totalSurcharge
+        return if (finalFee > 1500) 1500 else finalFee.toInt()
+    }
 
 }

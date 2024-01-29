@@ -1,4 +1,4 @@
-package com.wolt.DeliveryFeeCalculator
+package com.wolt.deliveryFeeCalculator
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
