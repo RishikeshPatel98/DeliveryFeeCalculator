@@ -1,8 +1,8 @@
-package com.wolt.DeliveryFeeCalculator.controller
+package com.wolt.deliveryFeeCalculator.controller
 
-import com.wolt.DeliveryFeeCalculator.entities.DeliveryFee
-import com.wolt.DeliveryFeeCalculator.entities.DeliveryFeeCalc
-import com.wolt.DeliveryFeeCalculator.service.DeliveryService
+import com.wolt.deliveryFeeCalculator.entities.DeliveryFee
+import com.wolt.deliveryFeeCalculator.entities.DeliveryFeeCalc
+import com.wolt.deliveryFeeCalculator.service.DeliveryService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
